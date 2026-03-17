@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 
 @Component
 @RequiredArgsConstructor
-public class KakaoLocalClient {
+public class KakaoLocalSearchClient {
 
     private final KakaoLocalProperties kakaoLocalProperties;
 

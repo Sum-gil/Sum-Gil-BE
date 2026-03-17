@@ -5,8 +5,8 @@ import com.example.sum_gil_be.dashboard.client.WeatherClient;
 import com.example.sum_gil_be.dashboard.domain.dto.AirQualityInfo;
 import com.example.sum_gil_be.dashboard.domain.dto.EnvironmentResponse;
 import com.example.sum_gil_be.dashboard.domain.dto.WeatherInfo;
+import com.example.sum_gil_be.dashboard.domain.dto.ResolvedRegion;
 import com.example.sum_gil_be.dashboard.util.GridPoint;
-import com.example.sum_gil_be.dashboard.util.RegionMapper;
 import com.example.sum_gil_be.dashboard.util.WeatherBaseTimeUtils;
 import com.example.sum_gil_be.dashboard.util.WeatherGridConverter;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,6 +23,7 @@ public class EnvironmentService {
     private final WeatherClient weatherClient;
     private final AirKoreaClient airKoreaClient;
     private final ObjectMapper objectMapper;
+    private final RegionResolveService regionResolveService;
 
     public EnvironmentResponse getEnvironment(double lat, double lng) {
         GridPoint grid = WeatherGridConverter.toGrid(lat, lng);
@@ -33,8 +34,9 @@ public class EnvironmentService {
 
         String weatherJson = weatherClient.getUltraSrtNcst(baseDate, baseTime, grid.getNx(), grid.getNy());
 
-        String sidoName = RegionMapper.getSidoName(lat, lng);
-        String regionName = RegionMapper.getRegionName(lat, lng);
+        ResolvedRegion resolvedRegion = regionResolveService.resolve(lat, lng);
+        String sidoName = resolvedRegion.sidoName();
+        String regionName = resolvedRegion.regionName();
 
         String airJson = airKoreaClient.getCtprvnRltmMesureDnsty(sidoName);
 
