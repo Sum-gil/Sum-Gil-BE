@@ -40,4 +40,10 @@ public class WalkSpot {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "green_ratio")
+    private Integer greenRatio;
+
+    @Column(name = "night_safe")
+    private Boolean nightSafe;
 }
