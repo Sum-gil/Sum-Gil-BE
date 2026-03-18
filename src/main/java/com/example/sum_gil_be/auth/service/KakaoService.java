@@ -10,6 +10,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.example.sum_gil_be.auth.domain.dto.AuthDto.KakaoUserInfo;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,28 +27,22 @@ public class KakaoService {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
-    //  설정파일에 적어둔 Client Secret 값을 가져옵니다.
     @Value("${kakao.client-secret}")
     private String clientSecret;
 
     public String getAccessToken(String code) {
         RestTemplate rt = new RestTemplate();
 
-        // 1. HTTP Header 설정
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
-        // 2. HTTP Body 설정
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", clientId);
         params.add("redirect_uri", redirectUri);
         params.add("code", code);
-        
-        //  Client Secret이 활성화 되어있으므로 반드시 추가해야 함
         params.add("client_secret", clientSecret);
 
-        // 3. HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
         
         try {
@@ -56,12 +53,53 @@ public class KakaoService {
                     String.class
             );
 
-            log.info("카카오 토큰 발급 성공!");
-            return response.getBody(); 
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response.getBody());
+            return jsonNode.get("access_token").asText();
             
         } catch (Exception e) {
             log.error("카카오 토큰 발급 실패: {}", e.getMessage());
-            return "토큰 요청 실패: " + e.getMessage();
+            throw new RuntimeException("카카오 토큰 발급 실패", e);
+        }
+    }
+
+    public KakaoUserInfo getUserInfo(String code) {
+        // 1. 인가 코드로 액세스 토큰 받기
+        String accessToken = getAccessToken(code);
+
+        // 2. 액세스 토큰으로 카카오 사용자 정보 받기
+        RestTemplate rt = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = rt.exchange(
+                    "https://kapi.kakao.com/v2/user/me",
+                    HttpMethod.POST,
+                    kakaoProfileRequest,
+                    String.class
+            );
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response.getBody());
+
+            String id = jsonNode.get("id").asText();
+            String nickname = jsonNode.get("properties").get("nickname").asText();
+            
+            // 이메일은 동의 항목에 따라 없을 수 있으므로 예외 처리
+            JsonNode kakaoAccount = jsonNode.get("kakao_account");
+            String email = "";
+            if (kakaoAccount.has("email")) {
+                email = kakaoAccount.get("email").asText();
+            }
+
+            return new KakaoUserInfo(id, email, nickname);
+        } catch (Exception e) {
+            log.error("카카오 사용자 정보 요청 실패: {}", e.getMessage());
+            throw new RuntimeException("카카오 사용자 정보 요청 실패", e);
         }
     }
 }
