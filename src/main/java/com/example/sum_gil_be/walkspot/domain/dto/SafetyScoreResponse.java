@@ -17,4 +17,6 @@ public class SafetyScoreResponse {
     private String administrativeDistrict;
     private Integer visitorCount;
     private Boolean nightSafe;
+    private Integer nearbyCctvCount;
+    private Integer cctvScore;
 }

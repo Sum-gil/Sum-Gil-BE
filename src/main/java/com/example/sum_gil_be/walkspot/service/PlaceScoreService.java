@@ -21,6 +21,7 @@ public class PlaceScoreService {
     private final RegionResolveService regionResolveService;
     private final SeoulPopulationService seoulPopulationService;
     private final EnvironmentService environmentService;
+    private final CctvScoreService cctvScoreService;
 
     public HealthScoreResponse getHealthScore(Long placeId) {
         WalkSpot place = getPlace(placeId);
@@ -78,13 +79,27 @@ public class PlaceScoreService {
         int visitorCount = extractVisitorCount(populationInfo);
         boolean nightSafe = Boolean.TRUE.equals(place.getNightSafe());
 
+        // CCTV 추가
+        int nearbyCctvCount = cctvScoreService.countNearbyCameras(
+                place.getLatitude(),
+                place.getLongitude()
+        );
+        int cctvScore = cctvScoreService.normalizeCctvCount(nearbyCctvCount);
+
         int populationSafetyScore = normalizeSafetyPopulation(visitorCount);
         int nightScore = nightSafe ? 90 : 40;
 
         int totalScore = (int) Math.round(
-                populationSafetyScore * 0.7 +
-                nightScore * 0.3
+                populationSafetyScore * 0.5 +
+                nightScore * 0.2 +
+                cctvScore * 0.3
         );
+
+        System.out.println("[SafetyScore] nearbyCctvCount = " + nearbyCctvCount);
+        System.out.println("[SafetyScore] cctvScore = " + cctvScore);
+        System.out.println("[SafetyScore] populationSafetyScore = " + populationSafetyScore);
+        System.out.println("[SafetyScore] nightScore = " + nightScore);
+        System.out.println("[SafetyScore] totalScore = " + totalScore);
 
         return SafetyScoreResponse.builder()
                 .placeId(place.getId())
@@ -95,6 +110,8 @@ public class PlaceScoreService {
                 .administrativeDistrict(populationInfo != null ? populationInfo.getAdministrativeDistrict() : null)
                 .visitorCount(visitorCount)
                 .nightSafe(nightSafe)
+                .nearbyCctvCount(nearbyCctvCount)
+                .cctvScore(cctvScore)
                 .build();
     }
 
