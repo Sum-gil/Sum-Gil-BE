@@ -18,7 +18,7 @@ import java.util.List;
 public class PlaceService {
 
     private final WalkSpotRepository walkSpotRepository;
-    private final KakaoLocalClient kakaoLocalClient;
+    private final KakaoLocalSearchClient kakaoLocalClient;
 
     public List<PlaceListResponse> getNearbyPlaces(double latitude, double longitude, double radius) {
         List<WalkSpot> walkSpots = walkSpotRepository.findAll();
