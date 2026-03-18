@@ -76,13 +76,29 @@ public class PlaceCtrl {
                 return ResponseEntity.ok(placeService.getInfrastructures(placeId, type));
         }
 
+        @Operation(
+        summary = "산책 장소 건강 점수 조회",
+        description = "산책 장소의 건강 점수를 조회합니다. " +
+                "건강 점수는 주변 녹지 비율, 공기질, 산책로 환경 등을 기반으로 계산됩니다."
+        )
         @GetMapping("/{placeId}/health-score")
-        public HealthScoreResponse getHealthScore(@PathVariable Long placeId) {
+        public HealthScoreResponse getHealthScore(
+                @Parameter(description = "산책 장소 ID", example = "1")
+                @PathVariable Long placeId
+        ) {
                 return placeScoreService.getHealthScore(placeId);
         }
 
+        @Operation(
+                summary = "산책 장소 안전 점수 조회",
+                description = "산책 장소의 안전 점수를 조회합니다. " +
+                        "안전 점수는 CCTV 개수, 유동 인구, 야간 안전도 등을 기반으로 계산됩니다."
+        )
         @GetMapping("/{placeId}/safety")
-        public SafetyScoreResponse getSafetyScore(@PathVariable Long placeId) {
+        public SafetyScoreResponse getSafetyScore(
+                @Parameter(description = "산책 장소 ID", example = "1")
+                @PathVariable Long placeId
+        ) {
                 return placeScoreService.getSafetyScore(placeId);
         }
 }       
