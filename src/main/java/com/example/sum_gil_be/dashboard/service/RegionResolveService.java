@@ -25,10 +25,11 @@ public class RegionResolveService {
                 .orElse(response.documents().get(0));
 
         String sidoName = normalizeSido(selected.region_1depth_name());
-        String regionName = extractRegionName(selected.region_2depth_name());
+        String guName = extractGuName(selected.region_2depth_name());
+        String dongName = extractDongName(selected.region_3depth_name());
         String fullAddress = selected.address_name();
 
-        return new ResolvedRegion(sidoName, regionName, fullAddress);
+        return new ResolvedRegion(sidoName, guName, dongName, fullAddress);
     }
 
     private String normalizeSido(String raw) {
@@ -46,11 +47,10 @@ public class RegionResolveService {
                 .trim();
     }
 
-    private String extractRegionName(String raw) {
+    private String extractGuName(String raw) {
         if (raw == null || raw.isBlank()) {
             return "기타";
         }
-
 
         String first = raw.split(" ")[0];
 
@@ -59,5 +59,13 @@ public class RegionResolveService {
                 .replace("군", "")
                 .replace("구", "")
                 .trim();
+    }
+
+    private String extractDongName(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return "기타";
+        }
+
+        return raw.replaceAll("\\s+", "").trim();
     }
 }

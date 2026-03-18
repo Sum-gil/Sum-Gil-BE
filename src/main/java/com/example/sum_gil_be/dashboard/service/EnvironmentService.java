@@ -36,7 +36,7 @@ public class EnvironmentService {
 
         ResolvedRegion resolvedRegion = regionResolveService.resolve(lat, lng);
         String sidoName = resolvedRegion.sidoName();
-        String regionName = resolvedRegion.regionName();
+        String regionName = resolvedRegion.guName();
 
         String airJson = airKoreaClient.getCtprvnRltmMesureDnsty(sidoName);
 
@@ -183,5 +183,13 @@ public class EnvironmentService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public AirQualityInfo getAirQualityInfo(double lat, double lng) {
+        ResolvedRegion resolvedRegion = regionResolveService.resolve(lat, lng);
+        String sidoName = resolvedRegion.sidoName();
+
+        String airJson = airKoreaClient.getCtprvnRltmMesureDnsty(sidoName);
+        return parseAirQuality(airJson);
     }
 }
