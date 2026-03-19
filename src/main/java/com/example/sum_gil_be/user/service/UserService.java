@@ -3,7 +3,8 @@ package com.example.sum_gil_be.user.service;
 import com.example.sum_gil_be.user.domain.dto.UserRequest;
 import com.example.sum_gil_be.user.domain.dto.UserResponse;
 import com.example.sum_gil_be.user.domain.entity.UserEntity;
-import com.example.sum_gil_be.user.domain.repository.UserRepository;
+import com.example.sum_gil_be.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
