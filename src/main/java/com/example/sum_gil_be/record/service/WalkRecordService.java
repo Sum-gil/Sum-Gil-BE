@@ -1,6 +1,12 @@
 package com.example.sum_gil_be.record.service;
 
-import com.example.sum_gil_be.record.domain.dto.*;
+import com.example.sum_gil_be.record.domain.dto.WalkEndRequest;
+import com.example.sum_gil_be.record.domain.dto.WalkPathPointResponse;
+import com.example.sum_gil_be.record.domain.dto.WalkPointRequest;
+import com.example.sum_gil_be.record.domain.dto.WalkRecordDetailResponse;
+import com.example.sum_gil_be.record.domain.dto.WalkRecordListResponse;
+import com.example.sum_gil_be.record.domain.dto.WalkStartRequest;
+import com.example.sum_gil_be.record.domain.dto.WalkStartResponse;
 import com.example.sum_gil_be.record.domain.entity.WalkPathPoint;
 import com.example.sum_gil_be.record.domain.entity.WalkRecord;
 import com.example.sum_gil_be.record.domain.entity.WalkRecordStatus;
@@ -8,6 +14,7 @@ import com.example.sum_gil_be.record.repository.WalkPathPointRepository;
 import com.example.sum_gil_be.record.repository.WalkRecordRepository;
 import com.example.sum_gil_be.user.domain.entity.UserEntity;
 import com.example.sum_gil_be.user.repository.UserRepository;
+import com.example.sum_gil_be.walkspot.repository.WalkSpotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,10 +29,13 @@ public class WalkRecordService {
     private final WalkRecordRepository walkRecordRepository;
     private final WalkPathPointRepository walkPathPointRepository;
     private final UserRepository userRepository;
+    private final WalkSpotRepository walkSpotRepository;
 
     @Transactional
     public WalkStartResponse startWalk(String principalValue, WalkStartRequest request) {
         UserEntity user = getUserByPrincipal(principalValue);
+
+        validateWalkSpot(request);
 
         if (walkRecordRepository.existsByUserIdAndStatus(user.getId(), WalkRecordStatus.IN_PROGRESS)) {
             throw new IllegalStateException("진행 중인 산책 기록이 이미 존재합니다.");
@@ -59,7 +69,7 @@ public class WalkRecordService {
         }
 
         if (request == null || request.points() == null || request.points().isEmpty()) {
-            return;
+            throw new IllegalArgumentException("저장할 좌표가 없습니다.");
         }
 
         List<WalkPathPoint> points = request.points().stream()
@@ -143,6 +153,20 @@ public class WalkRecordService {
                 record.getStatus().name(),
                 pathPoints
         );
+    }
+
+    private void validateWalkSpot(WalkStartRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("요청 값이 없습니다.");
+        }
+
+        if (request.walkSpotId() == null) {
+            throw new IllegalArgumentException("walkSpotId는 필수입니다.");
+        }
+
+        if (!walkSpotRepository.existsById(request.walkSpotId())) {
+            throw new IllegalArgumentException("존재하지 않는 산책 장소입니다.");
+        }
     }
 
     private UserEntity getUserByPrincipal(String principalValue) {
