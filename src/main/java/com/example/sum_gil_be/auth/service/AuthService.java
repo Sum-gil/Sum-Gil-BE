@@ -1,7 +1,7 @@
 package com.example.sum_gil_be.auth.service;
 
-import com.example.sum_gil_be.auth.domain.dto.AuthDto.KakaoUserInfo;
-import com.example.sum_gil_be.auth.domain.dto.AuthDto.TokenResponse;
+import com.example.sum_gil_be.auth.domain.dto.KakaoUserInfo;
+import com.example.sum_gil_be.auth.domain.dto.TokenResponse;
 import com.example.sum_gil_be.config.jwt.JwtUtil;
 import com.example.sum_gil_be.user.domain.entity.UserEntity;
 import com.example.sum_gil_be.user.repository.UserRepository;
@@ -20,13 +20,10 @@ public class AuthService {
 
     @Transactional
     public TokenResponse socialLogin(String code) {
-        // 1. 카카오 사용자 정보 가져오기
         KakaoUserInfo kakaoUser = kakaoService.getUserInfo(code);
 
-        // 2. 유저 정보 확인 및 저장 (회원가입/로그인)
         UserEntity user = userRepository.findByKakaoId(kakaoUser.getId())
                 .orElseGet(() -> {
-                    // 최초 로그인 시 회원가입 처리
                     UserEntity newUser = UserEntity.builder()
                             .kakaoId(kakaoUser.getId())
                             .email(kakaoUser.getEmail())
@@ -36,15 +33,12 @@ public class AuthService {
                     return userRepository.save(newUser);
                 });
 
-        // 3. JWT 토큰 발급 (원본 생성)
         String accessToken = jwtUtil.createAccessToken(user.getId());
         String refreshToken = jwtUtil.createRefreshToken(user.getId());
-
-        // 4. Refresh Token SHA-256 해싱 후 DB 저장 
+ 
         String hashedToken = jwtUtil.hashToken(refreshToken);
         user.updateRefreshToken(hashedToken);
 
-        // 5. 응답 시에는 해싱되지 않은 원본 토큰을 반환 
         return new TokenResponse(accessToken, refreshToken, user.getId());
     }
 

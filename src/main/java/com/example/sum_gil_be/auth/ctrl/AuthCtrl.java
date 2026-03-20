@@ -1,7 +1,7 @@
 package com.example.sum_gil_be.auth.ctrl;
 
-import com.example.sum_gil_be.auth.domain.dto.AuthDto.SocialLoginRequest;
-import com.example.sum_gil_be.auth.domain.dto.AuthDto.TokenResponse;
+import com.example.sum_gil_be.auth.domain.dto.SocialLoginRequest;
+import com.example.sum_gil_be.auth.domain.dto.TokenResponse;
 import com.example.sum_gil_be.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,11 +24,9 @@ public class AuthCtrl {
 
     private final AuthService authService;
 
-    // 브라우저 주소창 테스트를 위해 임시로 복구
     @GetMapping("/oauth/kakao")
     @Operation(summary = "카카오 로그인 리다이렉트 테스트", description = "브라우저에서 즉시 JSON 결과를 확인하기 위한 용도입니다.")
     public ResponseEntity<TokenResponse> socialLoginRedirect(@RequestParam("code") String code) {
-        // 서비스의 socialLogin을 호출하여 AT, RT를 받아옴
         TokenResponse tokenResponse = authService.socialLogin(code);
         return ResponseEntity.ok(tokenResponse);
     }

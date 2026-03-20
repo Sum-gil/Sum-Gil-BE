@@ -79,7 +79,6 @@ public class PlaceScoreService {
         int visitorCount = extractVisitorCount(populationInfo);
         boolean nightSafe = Boolean.TRUE.equals(place.getNightSafe());
 
-        // CCTV 추가
         int nearbyCctvCount = cctvScoreService.countNearbyCameras(
                 place.getLatitude(),
                 place.getLongitude()
