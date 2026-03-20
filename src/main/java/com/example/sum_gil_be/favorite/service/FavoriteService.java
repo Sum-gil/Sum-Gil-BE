@@ -5,7 +5,7 @@ import com.example.sum_gil_be.favorite.domain.dto.FavoriteResponse;
 import com.example.sum_gil_be.favorite.domain.entity.FavoriteEntity;
 import com.example.sum_gil_be.favorite.repository.FavoriteRepository;
 import com.example.sum_gil_be.user.domain.entity.UserEntity;
-import com.example.sum_gil_be.user.domain.repository.UserRepository;
+import com.example.sum_gil_be.user.repository.UserRepository;
 import com.example.sum_gil_be.walkspot.domain.entity.WalkSpot;
 import com.example.sum_gil_be.walkspot.repository.WalkSpotRepository;
 import lombok.RequiredArgsConstructor;

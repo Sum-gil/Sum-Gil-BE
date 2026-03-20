@@ -4,7 +4,8 @@ import com.example.sum_gil_be.auth.domain.dto.AuthDto.KakaoUserInfo;
 import com.example.sum_gil_be.auth.domain.dto.AuthDto.TokenResponse;
 import com.example.sum_gil_be.config.jwt.JwtUtil;
 import com.example.sum_gil_be.user.domain.entity.UserEntity;
-import com.example.sum_gil_be.user.domain.repository.UserRepository;
+import com.example.sum_gil_be.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
