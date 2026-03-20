@@ -28,12 +28,12 @@ public class UserEntity {
     private String nickname;
 
     @Column
-    private String interestRegion; 
+    private String interestRegion;
 
     @Column
-    private String healthInfo; 
+    private String healthInfo;
 
-    @CreationTimestamp 
+    @CreationTimestamp
     @Column(updatable = false)
     private LocalDate createdAt;
 
@@ -41,19 +41,25 @@ public class UserEntity {
     private String refreshToken;
 
     @Builder
-    public UserEntity(String kakaoId, String email, String nickname, String interestRegion, String refreshToken) {
+    public UserEntity(String kakaoId, String email, String nickname, String interestRegion, String healthInfo,
+            String refreshToken) {
         this.kakaoId = kakaoId;
         this.email = email;
         this.nickname = nickname;
         this.interestRegion = interestRegion;
+        this.healthInfo = healthInfo;
         this.refreshToken = refreshToken;
+    }
+
+    public boolean isRegistrationIncomplete() {
+        return this.interestRegion == null || this.interestRegion.trim().isEmpty();
     }
 
     public void updateProfile(String nickname, String interestRegion) {
         if (nickname != null && !nickname.trim().isEmpty()) {
             this.nickname = nickname;
         }
-        if (interestRegion != null) {
+        if (interestRegion != null && !interestRegion.trim().isEmpty()) {
             this.interestRegion = interestRegion;
         }
     }

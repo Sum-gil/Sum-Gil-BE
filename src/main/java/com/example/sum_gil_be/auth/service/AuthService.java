@@ -33,13 +33,15 @@ public class AuthService {
                     return userRepository.save(newUser);
                 });
 
+        boolean needsInfo = user.isRegistrationIncomplete();
+
         String accessToken = jwtUtil.createAccessToken(user.getId());
         String refreshToken = jwtUtil.createRefreshToken(user.getId());
  
         String hashedToken = jwtUtil.hashToken(refreshToken);
         user.updateRefreshToken(hashedToken);
 
-        return new TokenResponse(accessToken, refreshToken, user.getId());
+        return new TokenResponse(accessToken, refreshToken, user.getId(), needsInfo);
     }
 
     @Transactional
