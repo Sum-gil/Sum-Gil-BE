@@ -84,9 +84,6 @@ public class SeoulPopulationService {
             return new PopulationInfo(dongName, null, null);
         }
 
-        // 아직 서울 API가 영문 동 이름을 주기 때문에,
-        // exact dong 매칭은 추후 한글↔영문 동 이름 매핑이 필요함.
-        // 현재는 같은 구 안에서 최신 row 기반 평균값 사용.
         int avgVisitorCount = (int) Math.round(
                 guMatched.stream()
                         .map(SeoulPopulationRow::getVisitorCount)

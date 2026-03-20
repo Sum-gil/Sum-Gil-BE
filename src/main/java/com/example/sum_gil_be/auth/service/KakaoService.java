@@ -10,7 +10,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.sum_gil_be.auth.domain.dto.AuthDto.KakaoUserInfo;
+import com.example.sum_gil_be.auth.domain.dto.KakaoUserInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -64,10 +64,8 @@ public class KakaoService {
     }
 
     public KakaoUserInfo getUserInfo(String code) {
-        // 1. 인가 코드로 액세스 토큰 받기
         String accessToken = getAccessToken(code);
 
-        // 2. 액세스 토큰으로 카카오 사용자 정보 받기
         RestTemplate rt = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -89,7 +87,6 @@ public class KakaoService {
             String id = jsonNode.get("id").asText();
             String nickname = jsonNode.get("properties").get("nickname").asText();
             
-            // 이메일은 동의 항목에 따라 없을 수 있으므로 예외 처리
             JsonNode kakaoAccount = jsonNode.get("kakao_account");
             String email = "";
             if (kakaoAccount.has("email")) {

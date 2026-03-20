@@ -22,8 +22,8 @@ public class KakaoLocalClient {
         return restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/local/geo/coord2regioncode.json")
-                        .queryParam("x", lng)   // 경도
-                        .queryParam("y", lat)   // 위도
+                        .queryParam("x", lng)   
+                        .queryParam("y", lat)   
                         .queryParam("input_coord", "WGS84")
                         .build())
                 .retrieve()

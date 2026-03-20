@@ -27,12 +27,10 @@ public class JwtUtil {
         this.refreshTokenValidityTime = refreshTokenValidityInSeconds * 1000;
     }
 
-    // Access Token 생성 (클라이언트 전달용)
     public String createAccessToken(Long userId) {
         return createToken(userId, accessTokenValidityTime);
     }
 
-    // Refresh Token 생성 (클라이언트 전달용)
     public String createRefreshToken(Long userId) {
         return createToken(userId, refreshTokenValidityTime);
     }
@@ -69,13 +67,11 @@ public class JwtUtil {
         }
     }
 
-    // 토큰에서 userId 추출
     public Long getUserIdFromToken(String token) {
         Claims claims = getClaims(token);
         return Long.parseLong(claims.getSubject());
     }
 
-    // 토큰 검증
     public boolean validateToken(String token) {
         try {
             getClaims(token);

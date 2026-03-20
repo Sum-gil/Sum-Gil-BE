@@ -32,7 +32,6 @@ public class FavoriteService {
         WalkSpot walkSpot = walkSpotRepository.findById(request.getWalkSpotId())
                 .orElseThrow(() -> new RuntimeException("산책 장소를 찾을 수 없습니다."));
 
-        // 중복 체크
         if (favoriteRepository.existsByUserAndWalkSpot(user, walkSpot)) {
             throw new RuntimeException("이미 즐겨찾기에 등록된 장소입니다.");
         }
@@ -61,7 +60,6 @@ public class FavoriteService {
         FavoriteEntity favorite = favoriteRepository.findById(favoriteId)
                 .orElseThrow(() -> new RuntimeException("즐겨찾기 항목을 찾을 수 없습니다."));
 
-        // 본인 확인 (보안)
         if (!favorite.getUser().getId().equals(userId)) {
             throw new RuntimeException("삭제 권한이 없습니다.");
         }

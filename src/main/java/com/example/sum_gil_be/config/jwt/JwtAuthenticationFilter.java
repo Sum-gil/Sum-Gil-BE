@@ -35,7 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && jwtUtil.validateToken(jwt)) {
                 Long userId = jwtUtil.getUserIdFromToken(jwt);
 
-                // 권한 정보 없이 userId만 Principal로 사용하는 간단한 형태
                 UserDetails userDetails = new User(String.valueOf(userId), "", Collections.emptyList());
 
                 UsernamePasswordAuthenticationToken authentication =

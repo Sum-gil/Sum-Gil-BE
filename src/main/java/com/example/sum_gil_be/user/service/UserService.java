@@ -13,33 +13,27 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
+        private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
-    public UserResponse getProfile(Long userId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        @Transactional(readOnly = true)
+        public UserResponse getProfile(Long userId) {
+                UserEntity user = userRepository.findById(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return new UserResponse(
-                user.getId(),
-                user.getEmail(),
-                user.getNickname(),
-                user.getInterestRegion()
-        );
-    }
+                return new UserResponse(
+                                user.getId(),
+                                user.getEmail(),
+                                user.getNickname(),
+                                user.getInterestRegion());
+        }
 
-    @Transactional
-    public UserResponse updateProfile(Long userId, UserRequest request) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        @Transactional
+        public UserResponse updateProfile(Long userId, UserRequest request) {
+                UserEntity user = userRepository.findById(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        user.updateProfile(request.getNickname(), request.getInterestRegion());
-        
-        return new UserResponse(
-                user.getId(),
-                user.getEmail(),
-                user.getNickname(),
-                user.getInterestRegion()
-        );
-    }
+                user.updateProfile(request.getNickname(), request.getInterestRegion());
+
+                return UserResponse.from(user);
+        }
 }
