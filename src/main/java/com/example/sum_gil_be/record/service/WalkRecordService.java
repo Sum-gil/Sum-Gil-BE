@@ -24,13 +24,12 @@ public class WalkRecordService {
     private final UserRepository userRepository;
 
     @Transactional
-    public WalkStartResponse startWalk(Long userId, WalkStartRequest request) {
-        if (walkRecordRepository.existsByUserIdAndStatus(userId, WalkRecordStatus.IN_PROGRESS)) {
+    public WalkStartResponse startWalk(String principalValue, WalkStartRequest request) {
+        UserEntity user = getUserByPrincipal(principalValue);
+
+        if (walkRecordRepository.existsByUserIdAndStatus(user.getId(), WalkRecordStatus.IN_PROGRESS)) {
             throw new IllegalStateException("진행 중인 산책 기록이 이미 존재합니다.");
         }
-
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         WalkRecord walkRecord = WalkRecord.builder()
                 .user(user)
@@ -49,8 +48,10 @@ public class WalkRecordService {
     }
 
     @Transactional
-    public void savePoints(Long userId, Long walkRecordId, WalkPointRequest request) {
-        WalkRecord walkRecord = walkRecordRepository.findByIdAndUserId(walkRecordId, userId)
+    public void savePoints(String principalValue, Long walkRecordId, WalkPointRequest request) {
+        UserEntity user = getUserByPrincipal(principalValue);
+
+        WalkRecord walkRecord = walkRecordRepository.findByIdAndUserId(walkRecordId, user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("산책 기록을 찾을 수 없습니다."));
 
         if (walkRecord.getStatus() != WalkRecordStatus.IN_PROGRESS) {
@@ -75,8 +76,10 @@ public class WalkRecordService {
     }
 
     @Transactional
-    public void endWalk(Long userId, Long walkRecordId, WalkEndRequest request) {
-        WalkRecord walkRecord = walkRecordRepository.findByIdAndUserId(walkRecordId, userId)
+    public void endWalk(String principalValue, Long walkRecordId, WalkEndRequest request) {
+        UserEntity user = getUserByPrincipal(principalValue);
+
+        WalkRecord walkRecord = walkRecordRepository.findByIdAndUserId(walkRecordId, user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("산책 기록을 찾을 수 없습니다."));
 
         if (walkRecord.getStatus() != WalkRecordStatus.IN_PROGRESS) {
@@ -93,8 +96,10 @@ public class WalkRecordService {
     }
 
     @Transactional(readOnly = true)
-    public List<WalkRecordListResponse> getMyWalkRecords(Long userId) {
-        return walkRecordRepository.findByUserIdOrderByStartedAtDesc(userId).stream()
+    public List<WalkRecordListResponse> getMyWalkRecords(String principalValue) {
+        UserEntity user = getUserByPrincipal(principalValue);
+
+        return walkRecordRepository.findByUserIdOrderByStartedAtDesc(user.getId()).stream()
                 .map(record -> new WalkRecordListResponse(
                         record.getId(),
                         record.getStartedAt(),
@@ -109,8 +114,10 @@ public class WalkRecordService {
     }
 
     @Transactional(readOnly = true)
-    public WalkRecordDetailResponse getWalkRecordDetail(Long userId, Long walkRecordId) {
-        WalkRecord record = walkRecordRepository.findByIdAndUserId(walkRecordId, userId)
+    public WalkRecordDetailResponse getWalkRecordDetail(String principalValue, Long walkRecordId) {
+        UserEntity user = getUserByPrincipal(principalValue);
+
+        WalkRecord record = walkRecordRepository.findByIdAndUserId(walkRecordId, user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("산책 기록을 찾을 수 없습니다."));
 
         List<WalkPathPointResponse> pathPoints = walkPathPointRepository
@@ -136,5 +143,17 @@ public class WalkRecordService {
                 record.getStatus().name(),
                 pathPoints
         );
+    }
+
+    private UserEntity getUserByPrincipal(String principalValue) {
+        Long userId;
+        try {
+            userId = Long.parseLong(principalValue);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("인증된 사용자 식별값이 올바르지 않습니다.");
+        }
+
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 }
