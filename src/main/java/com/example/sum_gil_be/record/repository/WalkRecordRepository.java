@@ -9,14 +9,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface WalkRecordRepository extends JpaRepository<WalkRecord, Long> {
+
     List<WalkRecord> findByUserIdOrderByStartedAtDesc(Long userId);
+
     Optional<WalkRecord> findByIdAndUserId(Long id, Long userId);
+
     boolean existsByUserIdAndStatus(Long userId, WalkRecordStatus status);
 
-    Optional<WalkRecord> findByIdAndUser_KakaoId(Long id, String kakaoId);
-
-    List<WalkRecord> findAllByUser_KakaoIdAndStartedAtBetween(
-            String kakaoId,
+    List<WalkRecord> findAllByUserIdAndStartedAtBetween(
+            Long userId,
             LocalDateTime start,
             LocalDateTime end
     );
