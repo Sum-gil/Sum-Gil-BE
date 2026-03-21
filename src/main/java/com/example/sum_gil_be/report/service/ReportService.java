@@ -20,9 +20,9 @@ public class ReportService {
 
     private final WalkRecordRepository walkRecordRepository;
 
-    public WalkReportResponse getWalkReport(String kakaoId, Long walkRecordId) {
-        WalkRecord walkRecord = walkRecordRepository.findByIdAndUser_KakaoId(walkRecordId, kakaoId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 산책 기록을 찾을 수 없습니다."));
+    public WalkReportResponse getWalkReport(String userId, Long walkRecordId) {
+    WalkRecord walkRecord = walkRecordRepository.findByIdAndUserId(walkRecordId, Long.parseLong(userId))
+            .orElseThrow(() -> new IllegalArgumentException("해당 산책 기록을 찾을 수 없습니다."));
 
         int totalDurationSeconds = getDurationSeconds(walkRecord);
         double totalDistanceKm = nvl(walkRecord.getTotalDistance());
