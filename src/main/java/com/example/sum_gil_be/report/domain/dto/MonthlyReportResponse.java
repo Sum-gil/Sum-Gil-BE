@@ -12,11 +12,13 @@ public class MonthlyReportResponse {
 
     private Integer totalWalkCount;
     private Double totalDistanceKm;
-    private Long totalDurationSeconds;
+
+    private Integer totalDurationSeconds;
     private String totalDurationText;
 
-    private Long averageDurationSeconds;
+    private Integer averageDurationSeconds;
     private String averageDurationText;
 
     private Double averageHealthScore;
+    private Double totalCalories;
 }

@@ -10,19 +10,19 @@ import java.time.LocalDateTime;
 public class WalkReportResponse {
 
     private Long walkRecordId;
-    private String placeName;
+    private Long walkSpotId;
 
     private LocalDateTime startedAt;
     private LocalDateTime endedAt;
 
-    private Long totalDurationSeconds;
+    private Integer totalDurationSeconds;
     private String totalDurationText;
 
     private Double totalDistanceKm;
     private Double averageSpeedKmh;
 
-    private Double averageHealthScore;
-    private Double averageSafetyScore;
+    private Double calories;
+    private Integer averageHealthScore;
 
     private String reportMessage;
 }
