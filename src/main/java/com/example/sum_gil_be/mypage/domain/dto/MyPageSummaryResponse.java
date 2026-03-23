@@ -9,6 +9,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MyPageSummaryResponse {
 
+    private String email;
+    private String nickname;
+    private String interestRegion;
+    private String healthInfo;
     private long favoriteCount;
     private long totalWalkCount;
     private double totalDistanceKm;

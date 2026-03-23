@@ -43,6 +43,10 @@ public class MyPageService {
         long safeTotalDurationSeconds = totalDurationSeconds != null ? totalDurationSeconds : 0L;
 
         return MyPageSummaryResponse.builder()
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .interestRegion(user.getInterestRegion())
+                .healthInfo(user.getHealthInfo())
                 .favoriteCount(favoriteCount)
                 .totalWalkCount(totalWalkCount)
                 .totalDistanceKm(roundTo2(safeDistanceMeters / 1000.0))
