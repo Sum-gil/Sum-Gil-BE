@@ -11,4 +11,6 @@ public interface FavoriteRepository extends JpaRepository<FavoriteEntity, Long> 
     List<FavoriteEntity> findAllByUserId(Long userId);
 
     boolean existsByUserAndWalkSpot(UserEntity user, WalkSpot walkSpot);
+    
+    long countByUserId(Long userId);
 }
