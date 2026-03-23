@@ -49,7 +49,7 @@ public class MyPageService {
                 .healthInfo(user.getHealthInfo())
                 .favoriteCount(favoriteCount)
                 .totalWalkCount(totalWalkCount)
-                .totalDistanceKm(roundTo2(safeDistanceMeters / 1000.0))
+                .totalDistanceKm(roundTo2(safeDistanceMeters))
                 .totalCalories(roundTo1(safeCalories))
                 .averageHealthScore(roundTo1(safeAverageHealthScore))
                 .totalDurationSeconds(safeTotalDurationSeconds)
