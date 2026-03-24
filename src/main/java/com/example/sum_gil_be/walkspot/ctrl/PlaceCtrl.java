@@ -40,7 +40,7 @@ public class PlaceCtrl {
                 @RequestParam double longitude,
 
                 @Parameter(description = "검색 반경(미터), 기본값 3000", example = "3000")
-                @RequestParam(defaultValue = "3000") double radius
+                @RequestParam(defaultValue = "1000") double radius
         ) {
                 return ResponseEntity.ok(placeService.getNearbyPlaces(latitude, longitude, radius));
         }

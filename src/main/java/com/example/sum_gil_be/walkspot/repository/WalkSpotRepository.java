@@ -10,4 +10,5 @@ public interface WalkSpotRepository extends JpaRepository<WalkSpot, Long> {
     List<WalkSpot> findByRegion(String region);
 
     List<WalkSpot> findByRegionContaining(String region);
+    boolean existsByNameAndAddress(String name, String address);
 }
