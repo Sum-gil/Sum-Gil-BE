@@ -20,6 +20,7 @@ public class PlaceService {
     private final WalkSpotRepository walkSpotRepository;
     private final KakaoLocalSearchClient kakaoLocalClient;
 
+    // 기본 추천/일반 장소 조회용: 가장 가까운 3개
     public List<PlaceListResponse> getNearbyPlaces(double latitude, double longitude, double radius) {
         List<WalkSpot> walkSpots = walkSpotRepository.findAll();
         List<PlaceListResponse> result = new ArrayList<>();
@@ -46,12 +47,56 @@ public class PlaceService {
             );
         }
 
-        
         result.sort(Comparator.comparingDouble(PlaceListResponse::getDistance));
 
-        
         return result.stream()
                 .limit(3)
+                .toList();
+    }
+
+    // AI 추천용: 반경 내 후보들을 넓게 반환
+    public List<PlaceListResponse> getNearbyPlacesForAi(double latitude, double longitude, double radius) {
+        List<WalkSpot> walkSpots = walkSpotRepository.findAll();
+        List<PlaceListResponse> allPlaces = new ArrayList<>();
+        List<PlaceListResponse> placesInRadius = new ArrayList<>();
+
+        for (WalkSpot walkSpot : walkSpots) {
+            double distance = calculateDistanceMeter(
+                    latitude,
+                    longitude,
+                    walkSpot.getLatitude(),
+                    walkSpot.getLongitude()
+            );
+
+            PlaceListResponse place = PlaceListResponse.builder()
+                    .placeId(walkSpot.getId())
+                    .name(walkSpot.getName())
+                    .address(walkSpot.getAddress())
+                    .latitude(walkSpot.getLatitude())
+                    .longitude(walkSpot.getLongitude())
+                    .distance(Math.round(distance * 10) / 10.0)
+                    .region(walkSpot.getRegion())
+                    .safetyScore(walkSpot.getSafetyScore())
+                    .build();
+
+            allPlaces.add(place);
+
+            if (distance <= radius) {
+                placesInRadius.add(place);
+            }
+        }
+
+        allPlaces.sort(Comparator.comparingDouble(PlaceListResponse::getDistance));
+        placesInRadius.sort(Comparator.comparingDouble(PlaceListResponse::getDistance));
+
+        // 반경 안에 있으면 그 후보들을 반환
+        if (!placesInRadius.isEmpty()) {
+            return placesInRadius;
+        }
+
+        // 반경 안에 하나도 없으면 가까운 10개만 후보로 반환
+        return allPlaces.stream()
+                .limit(10)
                 .toList();
     }
 
@@ -76,8 +121,6 @@ public class PlaceService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 산책 장소를 찾을 수 없습니다. placeId=" + placeId));
 
         int radius = 2000;
-
-        KakaoPlaceSearchResponse response;
 
         if (type == null || type.isBlank()) {
             List<InfrastructureResponse> merged = new ArrayList<>();
