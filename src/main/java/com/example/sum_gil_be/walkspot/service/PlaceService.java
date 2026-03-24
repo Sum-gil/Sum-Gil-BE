@@ -46,17 +46,13 @@ public class PlaceService {
             );
         }
 
+        
         result.sort(Comparator.comparingDouble(PlaceListResponse::getDistance));
 
-        List<PlaceListResponse> filtered = result.stream()
-                .filter(place -> place.getDistance() <= radius)
+        
+        return result.stream()
+                .limit(3)
                 .toList();
-
-        if (!filtered.isEmpty()) {
-            return filtered;
-        }
-
-        return result.stream().limit(3).toList();
     }
 
     public PlaceDetailResponse getPlaceDetail(Long placeId) {
