@@ -46,4 +46,50 @@ public class WalkSpot {
 
     @Column(name = "night_safe")
     private Boolean nightSafe;
+
+    private WalkSpot(
+            String name,
+            String address,
+            Double latitude,
+            Double longitude,
+            String description,
+            Integer safetyScore,
+            String region,
+            LocalDateTime createdAt,
+            Integer greenRatio,
+            Boolean nightSafe
+    ) {
+        this.name = name;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.description = description;
+        this.safetyScore = safetyScore;
+        this.region = region;
+        this.createdAt = createdAt;
+        this.greenRatio = greenRatio;
+        this.nightSafe = nightSafe;
+    }
+
+    public static WalkSpot of(
+            String name,
+            String address,
+            Double latitude,
+            Double longitude,
+            String description,
+            String region
+    ) {
+        return new WalkSpot(
+                name,
+                address,
+                latitude,
+                longitude,
+                description,
+                null,
+                region,
+                LocalDateTime.now(),
+                null,
+                null
+        );
+    }
 }
