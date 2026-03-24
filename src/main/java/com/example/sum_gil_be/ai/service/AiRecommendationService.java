@@ -45,8 +45,9 @@ public class AiRecommendationService {
         int limit = Optional.ofNullable(condition.requestedCount()).orElse(3);
         limit = Math.min(Math.max(limit, 1), 5);
 
+        // 여기 핵심: 기본 3개용이 아니라 AI 전용 후보 조회 사용
         List<PlaceListResponse> nearbyPlaces =
-                placeService.getNearbyPlaces(request.latitude(), request.longitude(), effectiveRadius);
+                placeService.getNearbyPlacesForAi(request.latitude(), request.longitude(), effectiveRadius);
 
         if (nearbyPlaces == null || nearbyPlaces.isEmpty()) {
             return new AiRecommendationResponse(
@@ -57,13 +58,20 @@ public class AiRecommendationService {
             );
         }
 
+        // 먼저 가까운 후보 일부만 추려서 무거운 계산 수 줄이기
+        List<PlaceListResponse> candidatePlaces = nearbyPlaces.stream()
+                .sorted(Comparator.comparingDouble(place ->
+                        place.getDistance() != null ? place.getDistance() : Double.MAX_VALUE))
+                .limit(10)
+                .toList();
+
         Map<Long, WalkSpot> walkSpotMap = walkSpotRepository.findAllById(
-                nearbyPlaces.stream()
+                candidatePlaces.stream()
                         .map(PlaceListResponse::getPlaceId)
                         .toList()
         ).stream().collect(Collectors.toMap(WalkSpot::getId, walkSpot -> walkSpot));
 
-        List<RecommendedPlaceDto> recommendations = nearbyPlaces.stream()
+        List<RecommendedPlaceDto> recommendations = candidatePlaces.stream()
                 .map(place -> toRecommendedPlace(
                         place,
                         walkSpotMap.get(place.getPlaceId()),
@@ -95,16 +103,25 @@ public class AiRecommendationService {
 
         HealthScoreResponse health = placeScoreService.getHealthScore(place.getPlaceId());
         SafetyScoreResponse safety = placeScoreService.getSafetyScore(place.getPlaceId());
-        List<InfrastructureResponse> infrastructures =
-                placeService.getInfrastructures(place.getPlaceId(), null);
 
-        boolean hasCafe = infrastructures != null && infrastructures.stream()
-                .map(infra -> String.valueOf(infra.getType()))
-                .anyMatch(type -> "CAFE".equalsIgnoreCase(type));
+        boolean needInfrastructureCheck =
+                Boolean.TRUE.equals(condition.needCafe()) || Boolean.TRUE.equals(condition.needToilet());
 
-        boolean hasToilet = infrastructures != null && infrastructures.stream()
-                .map(infra -> String.valueOf(infra.getType()))
-                .anyMatch(type -> "TOILET".equalsIgnoreCase(type));
+        List<InfrastructureResponse> infrastructures = List.of();
+        boolean hasCafe = false;
+        boolean hasToilet = false;
+
+        if (needInfrastructureCheck) {
+            infrastructures = placeService.getInfrastructures(place.getPlaceId(), null);
+
+            hasCafe = infrastructures.stream()
+                    .map(infra -> String.valueOf(infra.getType()))
+                    .anyMatch(type -> "CAFE".equalsIgnoreCase(type));
+
+            hasToilet = infrastructures.stream()
+                    .map(infra -> String.valueOf(infra.getType()))
+                    .anyMatch(type -> "TOILET".equalsIgnoreCase(type));
+        }
 
         int healthScore = health != null && health.getHealthScore() != null ? health.getHealthScore() : 0;
         int safetyScore = safety != null && safety.getSafetyScore() != null ? safety.getSafetyScore() : 0;
@@ -127,7 +144,7 @@ public class AiRecommendationService {
                 walkSpot.getAddress(),
                 walkSpot.getLatitude(),
                 walkSpot.getLongitude(),
-                place.getDistance(),
+                distance,
                 healthScore,
                 safetyScore,
                 walkSpot.getNightSafe(),
