@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 public record WalkRecordListResponse(
         Long walkRecordId,
+        Long walkSpotId,
+        String walkSpotName,
         LocalDateTime startedAt,
         LocalDateTime endedAt,
         Double totalDistance,

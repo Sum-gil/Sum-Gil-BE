@@ -110,16 +110,24 @@ public class WalkRecordService {
         UserEntity user = getUserByPrincipal(principalValue);
 
         return walkRecordRepository.findByUserIdOrderByStartedAtDesc(user.getId()).stream()
-                .map(record -> new WalkRecordListResponse(
-                        record.getId(),
-                        record.getStartedAt(),
-                        record.getEndedAt(),
-                        record.getTotalDistance(),
-                        record.getDurationSeconds(),
-                        record.getCalories(),
-                        record.getAverageHealthScore(),
-                        record.getStatus().name()
-                ))
+                .map(record -> {
+                    String walkSpotName = walkSpotRepository.findById(record.getWalkSpotId())
+                            .map(walkSpot -> walkSpot.getName())
+                            .orElse("이름 없는 산책로");
+
+                    return new WalkRecordListResponse(
+                            record.getId(),
+                            record.getWalkSpotId(),
+                            walkSpotName,
+                            record.getStartedAt(),
+                            record.getEndedAt(),
+                            record.getTotalDistance(),
+                            record.getDurationSeconds(),
+                            record.getCalories(),
+                            record.getAverageHealthScore(),
+                            record.getStatus().name()
+                    );
+                })
                 .toList();
     }
 
