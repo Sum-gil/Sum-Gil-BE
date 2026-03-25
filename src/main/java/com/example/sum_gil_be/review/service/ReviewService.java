@@ -1,11 +1,5 @@
 package com.example.sum_gil_be.review.service;
 
-import java.util.List;
-
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.example.sum_gil_be.review.domain.dto.ReviewRequestDto;
 import com.example.sum_gil_be.review.domain.dto.ReviewResponseDto;
 import com.example.sum_gil_be.review.domain.entity.ReviewEntity;
@@ -14,8 +8,13 @@ import com.example.sum_gil_be.user.domain.entity.UserEntity;
 import com.example.sum_gil_be.user.repository.UserRepository;
 import com.example.sum_gil_be.walkspot.domain.entity.WalkSpot;
 import com.example.sum_gil_be.walkspot.repository.WalkSpotRepository;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +22,8 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final UserRepository userRepository; 
-    private final WalkSpotRepository walkSpotRepository; 
+    private final UserRepository userRepository;
+    private final WalkSpotRepository walkSpotRepository;
 
     @Transactional
     public Long createReview(ReviewRequestDto requestDto, String username) {
@@ -32,7 +31,7 @@ public class ReviewService {
 
         UserEntity user = userRepository.findById(Long.parseLong(username))
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        
+
         WalkSpot walkSpot = walkSpotRepository.findById(requestDto.getWalkSpotId())
                 .orElseThrow(() -> new IllegalArgumentException("산책 장소를 찾을 수 없습니다."));
 
@@ -52,7 +51,7 @@ public class ReviewService {
 
         ReviewEntity review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰가 존재하지 않습니다."));
-        
+
         UserEntity currentUser = userRepository.findById(Long.parseLong(username))
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -67,7 +66,7 @@ public class ReviewService {
     public void deleteReview(Long reviewId, String username) {
         ReviewEntity review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰가 존재하지 않습니다."));
-        
+
         UserEntity currentUser = userRepository.findById(Long.parseLong(username))
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -81,19 +80,32 @@ public class ReviewService {
     public List<ReviewResponseDto> getReviewsByWalkSpot(Long walkSpotId) {
         return reviewRepository.findAllByWalkSpotIdOrderByCreatedAtDesc(walkSpotId)
                 .stream()
-                .map(review -> ReviewResponseDto.builder()
-                        .id(review.getId())
-                        .rating(review.getRating())
-                        .content(review.getContent())
-                        .createdAt(review.getCreatedAt())
-                        .nickname(review.getUser().getNickname()) 
-                        .build())
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    public List<ReviewResponseDto> getAllReviews() {
+        return reviewRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(this::toResponseDto)
                 .toList();
     }
 
     public List<WalkSpot> getPopularPlaces() {
-        Pageable topFive = org.springframework.data.domain.PageRequest.of(0, 5);
+        Pageable topFive = PageRequest.of(0, 5);
         return reviewRepository.findPopularPlaces(topFive);
+    }
+
+    private ReviewResponseDto toResponseDto(ReviewEntity review) {
+        return ReviewResponseDto.builder()
+                .id(review.getId())
+                .walkSpotId(review.getWalkSpot().getId())
+                .walkSpotName(review.getWalkSpot().getName())
+                .rating(review.getRating())
+                .content(review.getContent())
+                .createdAt(review.getCreatedAt())
+                .nickname(review.getUser().getNickname())
+                .build();
     }
 
     private void validateRating(Long rating) {
