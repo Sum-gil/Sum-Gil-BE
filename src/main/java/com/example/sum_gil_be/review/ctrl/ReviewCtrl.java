@@ -50,6 +50,13 @@ public class ReviewCtrl {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "커뮤니티 전체 리뷰 목록 조회", description = "전체 리뷰를 최신순으로 조회합니다.")
+    @GetMapping("/api/community/reviews")
+    public ResponseEntity<List<ReviewResponseDto>> getAllCommunityReviews() {
+        return ResponseEntity.ok(reviewService.getAllReviews());
+    }
+
+
     @Operation(summary = "리뷰 삭제", description = "작성한 리뷰를 삭제합니다.")
     @DeleteMapping("/api/reviews/{reviewId}")
     public ResponseEntity<Void> deleteReview(
