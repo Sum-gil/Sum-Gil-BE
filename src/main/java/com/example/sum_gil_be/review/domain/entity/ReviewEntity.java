@@ -2,8 +2,7 @@ package com.example.sum_gil_be.review.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.CreationTimestamp;
 
 import com.example.sum_gil_be.user.domain.entity.UserEntity;
 import com.example.sum_gil_be.walkspot.domain.entity.WalkSpot;
@@ -14,7 +13,6 @@ import java.time.LocalDateTime;
 @Table(name = "review")
 @Getter
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 public class ReviewEntity {
 
     @Id
@@ -27,17 +25,17 @@ public class ReviewEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private UserEntity user; 
+    private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "walkspot_id")
-    private WalkSpot walkSpot; 
+    private WalkSpot walkSpot;
 
     @Builder
     public ReviewEntity(Long rating, String content, UserEntity user, WalkSpot walkSpot) {
