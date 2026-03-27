@@ -20,7 +20,7 @@ public class PlaceService {
     private final WalkSpotRepository walkSpotRepository;
     private final KakaoLocalSearchClient kakaoLocalClient;
 
-    // 기본 추천/일반 장소 조회용: 가장 가까운 3개
+    // 기본 추천/일반 장소 조회용: 가장 가까운 10개
     public List<PlaceListResponse> getNearbyPlaces(double latitude, double longitude, double radius) {
         List<WalkSpot> walkSpots = walkSpotRepository.findAll();
         List<PlaceListResponse> result = new ArrayList<>();
@@ -50,7 +50,7 @@ public class PlaceService {
         result.sort(Comparator.comparingDouble(PlaceListResponse::getDistance));
 
         return result.stream()
-                .limit(3)
+                .limit(10)
                 .toList();
     }
 
