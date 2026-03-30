@@ -21,7 +21,7 @@ public interface WalkRecordRepository extends JpaRepository<WalkRecord, Long> {
     List<WalkRecord> findAllByUserIdAndStartedAtBetween(
             Long userId,
             LocalDateTime start,
-            LocalDateTime end
+            LocalDateTime end 
     );
     long countByUserId(Long userId);
 
