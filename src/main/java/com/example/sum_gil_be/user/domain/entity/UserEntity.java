@@ -40,6 +40,9 @@ public class UserEntity {
     @Column(length = 500)
     private String refreshToken;
 
+    @Column(length = 500)
+    private String fcmToken;
+
     @Builder
     public UserEntity(String kakaoId, String email, String nickname, String interestRegion, String healthInfo,
             String refreshToken) {
@@ -70,5 +73,9 @@ public class UserEntity {
 
     public void invalidateRefreshToken() {
         this.refreshToken = null;
+    }
+
+    public void updateFcmToken(String token) {
+        this.fcmToken = token;
     }
 }

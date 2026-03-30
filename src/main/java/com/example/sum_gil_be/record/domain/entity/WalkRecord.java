@@ -53,6 +53,18 @@ public class WalkRecord {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    @Column
+    private Boolean notified10m = false;
+
+    @Column
+    private Boolean notified20m = false;
+
+    @Column
+    private Boolean notified30m = false;
+
+    @Column
+    private Boolean healthWarningSent = false;
+
     @Builder
     public WalkRecord(UserEntity user, Long walkSpotId, LocalDateTime startedAt, WalkRecordStatus status) {
         this.user = user;
@@ -68,5 +80,21 @@ public class WalkRecord {
         this.calories = calories;
         this.averageHealthScore = averageHealthScore;
         this.status = WalkRecordStatus.COMPLETED;
+    }
+
+    public void mark10mNotified() {
+        this.notified10m = true;
+    }
+
+    public void mark20mNotified() {
+        this.notified20m = true;
+    }
+
+    public void mark30mNotified() {
+        this.notified30m = true;
+    }
+
+    public void markHealthWarningSent() {
+        this.healthWarningSent = true;
     }
 }

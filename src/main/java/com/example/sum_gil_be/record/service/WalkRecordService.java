@@ -1,5 +1,6 @@
 package com.example.sum_gil_be.record.service;
 
+import com.example.sum_gil_be.notification.service.FcmService;
 import com.example.sum_gil_be.record.domain.dto.WalkEndRequest;
 import com.example.sum_gil_be.record.domain.dto.WalkPathPointResponse;
 import com.example.sum_gil_be.record.domain.dto.WalkPointRequest;
@@ -18,7 +19,7 @@ import com.example.sum_gil_be.walkspot.repository.WalkSpotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.example.sum_gil_be.notification.service.FcmService;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class WalkRecordService {
     private final WalkPathPointRepository walkPathPointRepository;
     private final UserRepository userRepository;
     private final WalkSpotRepository walkSpotRepository;
+    private final FcmService fcmService;
 
     @Transactional
     public WalkStartResponse startWalk(String principalValue, WalkStartRequest request) {
@@ -103,6 +105,20 @@ public class WalkRecordService {
                 request.calories(),
                 request.averageHealthScore()
         );
+
+       
+        if (request.averageHealthScore() != null && request.averageHealthScore() <= 40) {
+
+            String token = user.getFcmToken();
+
+            if (token != null && !token.isBlank()) {
+                fcmService.send(
+                        token,
+                        "건강 경고",
+                        "현재 건강 점수가 낮습니다. 잠시 휴식을 추천드립니다."
+                );
+            }
+        }
     }
 
     @Transactional(readOnly = true)

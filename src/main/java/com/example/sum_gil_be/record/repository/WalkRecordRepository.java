@@ -36,4 +36,6 @@ public interface WalkRecordRepository extends JpaRepository<WalkRecord, Long> {
 
     @Query("select coalesce(sum(w.durationSeconds), 0) from WalkRecord w where w.user.id = :userId")
     Long sumDurationSecondsByUserId(@Param("userId") Long userId);
+
+    List<WalkRecord> findByStatus(WalkRecordStatus status);
 }
