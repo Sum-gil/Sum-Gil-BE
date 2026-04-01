@@ -21,7 +21,7 @@ public interface WalkRecordRepository extends JpaRepository<WalkRecord, Long> {
     List<WalkRecord> findAllByUserIdAndStartedAtBetween(
             Long userId,
             LocalDateTime start,
-            LocalDateTime end
+            LocalDateTime end 
     );
     long countByUserId(Long userId);
 
@@ -36,4 +36,6 @@ public interface WalkRecordRepository extends JpaRepository<WalkRecord, Long> {
 
     @Query("select coalesce(sum(w.durationSeconds), 0) from WalkRecord w where w.user.id = :userId")
     Long sumDurationSecondsByUserId(@Param("userId") Long userId);
+
+    List<WalkRecord> findByStatus(WalkRecordStatus status);
 }
