@@ -1,9 +1,9 @@
 package com.example.sum_gil_be.config;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -16,15 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class FcmConfig {
 
+    private static final String FIREBASE_CONFIG_PATH = "/app/firebase.json";
+
     @PostConstruct
     public void initialize() {
-        try {
+        try (FileInputStream serviceAccount = new FileInputStream(FIREBASE_CONFIG_PATH)) {
+
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(
-                            GoogleCredentials.fromStream(
-                                    new ClassPathResource("sum-gil-firebase-adminsdk-fbsvc-2282a0ccae.json").getInputStream()
-                            )
-                    )
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {
