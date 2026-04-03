@@ -38,3 +38,7 @@ out/
 
 ### Spring config ###
 src/main/resources/application.yaml
+
+sum-gil-firebase-adminsdk-*.json
+
+*.yaml
