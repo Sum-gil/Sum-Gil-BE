@@ -262,6 +262,7 @@
 |---|---|---|---|
 | Health | GET | `/health` | 서버 상태 확인 |
 | Auth | GET | `/api/auth/oauth/kakao` | 카카오 로그인 |
+| Ai | POST | `/api/ai/recommendations` | Ai 산책로 추천 |
 | Place | GET | `/api/places` | 주변 산책로 조회 |
 | Place | GET | `/api/places/{id}` | 산책로 상세 |
 | Place | GET | `/api/places/{id}/health-score` | 건강 점수 |
