@@ -321,14 +321,14 @@
 
 ---
 
-## 📡 Notification
+## 🔔 Notification
 
 - Firebase Cloud Messaging 사용
 - 산책 중 알림 제공
 
 ---
 
-## 🧠 Core Logic
+## ⚙️ Core Logic
 
 ### Health Score
 ```
