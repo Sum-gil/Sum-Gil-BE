@@ -14,7 +14,7 @@
 ---
 
 <details>
-<summary><h2>📂 Data Structure</h2></summary>
+<summary><h2>📂 Project Structure</h2></summary>
 
 ```bash
 📦src
