@@ -283,6 +283,7 @@
 
 
 ## ☁️ Infrastructure
+<img src="https://raw.githubusercontent.com/M4rs0312/m4rs.github.io/11a4bb04576280068b759c285b8ddc0d32cd1850/%ED%99%94%EB%A9%B4%20%EC%BA%A1%EC%B2%98%202026-04-08%20174230.png" width="700"/>
 
 > 본 서비스는 AWS EC2 기반으로 운영되며  
 > Nginx Reverse Proxy를 통해 HTTPS 환경을 구성했습니다.  
